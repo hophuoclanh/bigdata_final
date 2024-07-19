@@ -38,5 +38,4 @@ with DAG(
     )
 
     # # Define task dependencies
-    start_kafka >> start_spark
-    read_delta
+    start_redus >> start_kafka >> start_spark >> read_delta
