@@ -2,8 +2,6 @@ from airflow import DAG
 from airflow.operators.bash import BashOperator
 from datetime import datetime, timedelta
 
-# Define the common path for the scripts
-
 # Define the DAG
 with DAG(
     "mobileprice",
@@ -22,20 +20,30 @@ with DAG(
     tags=["example"],
 ) as dag:
 
+    start_redis = BashOperator(
+        task_id="start_redis",
+        bash_command="sudo /usr/bin/redis-server /etc/redis/redis.conf",
+    )
+
+    start_hadoop = BashOperator(
+        task_id="start_hadoop",
+        bash_command="python3 /home/labsoe/Documents/mobile_price/start_hadoop.py",
+    )
+
     start_spark = BashOperator(
         task_id="start_spark",
-        bash_command=f"python3 /home/labsoe/Documents/mobile_price/start_spark.py",
+        bash_command="python3 /home/labsoe/Documents/mobile_price/start_spark.py",
     )
 
     start_kafka = BashOperator(
         task_id="start_kafka",
-        bash_command=f"python3 /home/labsoe/Documents/mobile_price/start_kafka.py",
+        bash_command="python3 /home/labsoe/Documents/mobile_price/start_kafka.py",
     )
 
     read_delta = BashOperator(
         task_id="read_delta",
-        bash_command=f"python3 /home/labsoe/Documents/mobile_price/read_delta.py",
+        bash_command="python3 /home/labsoe/Documents/mobile_price/read_delta.py",
     )
 
-    # # Define task dependencies
-    start_redus >> start_kafka >> start_spark >> read_delta
+    # Define task dependencies
+    start_redis >> start_hadoop >> start_spark >> start_kafka >> read_delta
