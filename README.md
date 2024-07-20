@@ -3,8 +3,7 @@
 <!-- PROJECT LOGO -->
 <br />
 <div align="center">
-  <a href="https://github.com/othneildrew/Best-README-Template">
-  </a>
+
 
   <h3 align="center">Big Data</h3>
 
@@ -37,11 +36,8 @@ Mobile Price Prediction and Streaming Project    <br />
       </ul>
     </li>
     <li><a href="#usage">Usage</a></li>
-    <li><a href="#roadmap">Roadmap</a></li>
     <li><a href="#contributing">Contributing</a></li>
-    <li><a href="#license">License</a></li>
     <li><a href="#contact">Contact</a></li>
-    <li><a href="#acknowledgments">Acknowledgments</a></li>
   </ol>
 </details>
 
@@ -51,7 +47,6 @@ Mobile Price Prediction and Streaming Project    <br />
 ## About The Project
 
 This project implements a mobile price prediction pipeline using Apache Spark, Kafka, and Delta Lake. The pipeline involves data ingestion, real-time data processing, model storage, and orchestration with Airflow and Redis Queue.
-<p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 <h2>UML Diagram</h2>
 
@@ -59,7 +54,7 @@ This project implements a mobile price prediction pipeline using Apache Spark, K
 Note: Worker "69" means that the task is executed at address 192.168.80.69 and so on.
 ## Components
 
-### Data Ingestion
+# Data Ingestion
 
 - **CSV File**: 
   - Contains the data for training, evaluating and streaming. We save it to hdfs to access easily.
@@ -70,7 +65,7 @@ Note: Worker "69" means that the task is executed at address 192.168.80.69 and s
 - **Kafka Topic**: 
   - Receives data from the Kafka producer.
 
-### Model Storage
+# Model Storage
 
 - **Hadoop**: 
   - Storage system for the trained model.
@@ -78,7 +73,7 @@ Note: Worker "69" means that the task is executed at address 192.168.80.69 and s
 - **Logistic Regression Model**: 
   - Trained model stored in Hadoop.
 
-### Real-Time Data Processing
+# Real-Time Data Processing
 
 - **Spark Streaming**: 
   - Reads data from Kafka, applies the model, and produces predictions.
@@ -89,7 +84,7 @@ Note: Worker "69" means that the task is executed at address 192.168.80.69 and s
 - **HDFS**: 
   - Storage for the model and predictions.
 
-### Reading Delta Table
+# Reading Delta Table
 
 - **Delta Table in HDFS**: 
   - Stores the predictions.
@@ -97,7 +92,7 @@ Note: Worker "69" means that the task is executed at address 192.168.80.69 and s
 - **Spark DataFrame**: 
   - Loads data from the Delta table for further processing.
 
-### Orchestration
+# Orchestration
 
 - **Airflow DAG**: 
   - Manages the execution of tasks.
@@ -108,12 +103,12 @@ Note: Worker "69" means that the task is executed at address 192.168.80.69 and s
 - **Tasks**: 
   - Include starting Redis, Hadoop, Spark, Kafka, and reading the Delta table.
 
-### Task Execution
+# Task Execution
 
 - **RQ Worker**: 
   - Listens on the Redis at "69" queue and executes tasks.
 
-### Workflow
+## Workflow
 
 1. **Start Redis**: 
    - Airflow DAG enqueues the task to start Redis.
@@ -122,59 +117,117 @@ Note: Worker "69" means that the task is executed at address 192.168.80.69 and s
    - Redis server enqueues the task to start Hadoop, executed by RQ Worker.
    
 3. **Start Spark**: 
-   - Enqueued and executed similarly.
+   - Enqueued the tasks to start Spark and execute relevant tasks including load model from HDFS and streaming and reading data before the prediction. And reading predictions to delta table.
    
 4. **Start Kafka**: 
-   - Enqueued and executed similarly.
-   
+   - Enqueued and start Kafka and streaming data file.
+  
 5. **Read Delta**: 
    - Reads the Delta table from HDFS.
 
 ## Scripts
 To ensure that the execution does not encounter any interruptions, the different machines or computers where tasks are executed will need to have the files from each folder in the repository readily available.
-- **`load1.py`**: 
-  - Reads streaming data from Kafka, applies the model, and writes predictions to HDFS.
+## Directory Structure
+# `redis/`
 
-    
-- **`start_redis.py`**: 
-  - Starts Redis services.
-  
-  
+- **`.py`**
+  - Defines the Airflow DAG that orchestrates the workflow of starting services and running scripts.
+# `airflow/`
 
-- **`start_hadoop.py`**: 
-  - Starts Hadoop services.
-    
-- **`start_kafka.py`**: 
-  - Starts Kafka services and streaming data file.
-- **`start_spark.py`**: 
-  - Starts Spark services and loads the model to predict and show predictions.
+- **`mobileprice.py`**
+  - Defines the Airflow DAG that orchestrates the workflow of starting services and running scripts.
+ 
+# `hadoop/`
 
- - **`readdelta_mobileprice.py`**: 
-  - Reads the Delta table from HDFS and shows the data.
-  
-  
-- **`mobilepricestreaming.py`**: 
-  - Sends data from a CSV file to Kafka for streaming.
+- **`mobile_price.py`**
+Contains the PySpark script for training a Logistic Regression model using data from HDFS.
+tasks.py: Includes a script for starting Hadoop services.
+**`test.csv`**: Sample data file for testing purposes (if applicable).
+**`test.csv`**: Sample data file for training purposes (if applicable).
+  **`tasks.py`**: This script starts Hadoop services using the command-line interface.
 
-## Getting Started
+# `kafka/`
 
-1. **Set Up Environment**: 
-   - Ensure Redis, Hadoop, Spark, Kafka, and Delta Lake are properly installed and configured.
+- **`mobile_price_streaming.py`**
+  - Reads data from `test.csv`.
+  - Sends data to the Kafka topic `mobile_price`.
 
-2. **Kafka Producer**: 
-   - Run the Kafka Producer Script to ingest data from CSV files into Kafka topics.
+- **`tasks.py`**
+  - Starts Kafka and Zookeeper services using the command-line interface.
 
-3. **Model Training**: 
-   - Execute the Model Training Script to train the Logistic Regression model and save it to HDFS.
 
-4. **Real-Time Processing**: 
-   - Start the Spark Streaming Script to process incoming data in real-time and write predictions to the Delta table.
+### `spark/`
 
-5. **Analyze Data**: 
-   - Use the Delta Table Reading Script to read and analyze data from the Delta table.
+- **`load1.py`**
+  - Reads streaming data from Kafka.
+  - Applies a pre-trained Logistic Regression model.
+  - Writes predictions to the console and HDFS.
+  - - **`tasks.py`**
+  - Starts spark services and submit file load1.py using the command-line interface.
 
-6. **Orchestration**: 
-   - Use the Airflow DAG Script to manage the overall workflow and automate the execution of the above steps.
+
+### `delta/`
+
+- **`readdelta_mobile_price.py`**
+  - Reads streaming data from a Delta Lake table.
+  - Writes the output to the console 
+  - - **`tasks.py`**
+  - Submit file readdelta_mobile_price.py using the command-line interface.
+
+
+## Kafka Setup
+
+### `mobile_price_streaming.py`
+
+- **Purpose**: Streams data from `test.csv` to Kafka.
+- **Functionality**:
+  - Reads rows from `test.csv`.
+  - Sends each row as a JSON message to the Kafka topic `mobile_price`.
+  - Introduces a random delay between messages.
+
+### `tasks.py`
+
+- **Purpose**: Manages the startup of Kafka and Zookeeper.
+- **Functionality**:
+  - Changes the directory to Kafka installation path.
+  - Starts Zookeeper and Kafka servers.
+  - Handles interruptions and errors.
+
+## Spark Setup
+
+### `load1.py`
+
+- **Purpose**: Processes streaming data from Kafka and applies a model.
+- **Functionality**:
+  - Reads data from Kafka topic `mobile_price`.
+  - Transforms JSON data into feature vectors.
+  - Loads a pre-trained Logistic Regression model from HDFS.
+  - Applies the model to the streaming data.
+  - Writes predictions to both the console and HDFS in Delta format.
+
+## Delta Lake Setup
+
+### `readdelta_mobile_price.py`
+
+- **Purpose**: Streams data from a Delta Lake table.
+- **Functionality**:
+  - Reads streaming data from the Delta Lake table at `hdfs://192.168.80.67:9000/mobile_predict`.
+  - Writes the data to the console.
+
+## Running the Pipeline
+
+1. **Start Services**:
+   - Use `tasks.py` to start Kafka and Zookeeper.
+
+2. **Stream Data**:
+   - Run `mobile_price_streaming.py` to stream data to Kafka.
+
+3. **Process Data**:
+   - Execute `load1.py` to read from Kafka, apply the model, and store results in HDFS.
+
+4. **Read Processed Data**:
+   - Run `readdelta_mobile_price.py` to read and display data from Delta Lake.
+
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
@@ -322,21 +375,16 @@ Ensure you have the following software installed on your machine:
 Provide examples and explanations for how to use your project. Consider including code snippets or step-by-step instructions.
 
 ```sh
-# Example command to run your project
-./run.sh
+./run.
+```
 
 
-<p align="right">(<a href="#readme-top">back to top</a>)</p>
-
-
-
+<p align="right">(<a href="#readme-top">back to top</a>)</p
 
 
 
 
-<!-- CONTRIBUTING -->
-## Contributing
-
+### Contributing
 Contributions are what make the open source community such an amazing place to learn, inspire, and create. Any contributions you make are **greatly appreciated**.
 
 If you have a suggestion that would make this better, please fork the repo and create a pull request. You can also simply open an issue with the tag "enhancement".
@@ -351,13 +399,6 @@ Don't forget to give the project a star! Thanks again!
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 
-
-<!-- LICENSE -->
-## License
-
-Distributed under the MIT License. See `LICENSE.txt` for more information.
-
-<p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 
 
