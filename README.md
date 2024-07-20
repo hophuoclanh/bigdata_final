@@ -4,14 +4,13 @@
 <br />
 <div align="center">
   <a href="https://github.com/othneildrew/Best-README-Template">
-    <img src="images/logo.png" alt="Logo" width="80" height="80">
   </a>
 
   <h3 align="center">Big Data</h3>
 
   <p align="center">
 Mobile Price Prediction and Streaming Project    <br />
-    <a href="https://www.canva.com/design/DAGLKbMhFtY/SZyxvommJOsJmA8BRyAQUg/edit"><strong>Explore the docs »</strong></a>
+    <a href="https://www.canva.com/design/DAGLKbMhFtY/SZyxvommJOsJmA8BRyAQUg/edit"><strong>Explore the slides »</strong></a>
     <br />
     <br />
   
@@ -56,6 +55,128 @@ This project implements a mobile price prediction pipeline using Apache Spark, K
 
 <h2>UML Diagram</h2>
 
+<img src="uml.png" >
+Note: Worker "69" means that the task is executed at address 192.168.80.69 and so on.
+## Components
+
+### Data Ingestion
+
+- **CSV File**: 
+  - Contains the data for training, evaluating and streaming. We save it to hdfs to access easily.
+  
+- **Kafka Producer**: 
+  - Reads data from the CSV file and sends it to a Kafka topic.
+  
+- **Kafka Topic**: 
+  - Receives data from the Kafka producer.
+
+### Model Storage
+
+- **Hadoop**: 
+  - Storage system for the trained model.
+  
+- **Logistic Regression Model**: 
+  - Trained model stored in Hadoop.
+
+### Real-Time Data Processing
+
+- **Spark Streaming**: 
+  - Reads data from Kafka, applies the model, and produces predictions.
+  
+- **Logistic Regression Model**: 
+  - Used for predictions.
+  
+- **HDFS**: 
+  - Storage for the model and predictions.
+
+### Reading Delta Table
+
+- **Delta Table in HDFS**: 
+  - Stores the predictions.
+  
+- **Spark DataFrame**: 
+  - Loads data from the Delta table for further processing.
+
+### Orchestration
+
+- **Airflow DAG**: 
+  - Manages the execution of tasks.
+  
+- **Redis Queue**: 
+  - Manages the queue of tasks to be executed.
+  
+- **Tasks**: 
+  - Include starting Redis, Hadoop, Spark, Kafka, and reading the Delta table.
+
+### Task Execution
+
+- **RQ Worker**: 
+  - Listens on the Redis at "69" queue and executes tasks.
+
+### Workflow
+
+1. **Start Redis**: 
+   - Airflow DAG enqueues the task to start Redis.
+   
+2. **Start Hadoop**: 
+   - Redis server enqueues the task to start Hadoop, executed by RQ Worker.
+   
+3. **Start Spark**: 
+   - Enqueued and executed similarly.
+   
+4. **Start Kafka**: 
+   - Enqueued and executed similarly.
+   
+5. **Read Delta**: 
+   - Reads the Delta table from HDFS.
+
+## Scripts
+To ensure that the execution does not encounter any interruptions, the different machines or computers where tasks are executed will need to have the files from each folder in the repository readily available.
+- **`load1.py`**: 
+  - Reads streaming data from Kafka, applies the model, and writes predictions to HDFS.
+
+    
+- **`start_redis.py`**: 
+  - Starts Redis services.
+  
+  
+
+- **`start_hadoop.py`**: 
+  - Starts Hadoop services.
+    
+- **`start_kafka.py`**: 
+  - Starts Kafka services and streaming data file.
+- **`start_spark.py`**: 
+  - Starts Spark services and loads the model to predict and show predictions.
+
+ - **`readdelta_mobileprice.py`**: 
+  - Reads the Delta table from HDFS and shows the data.
+  
+  
+- **`mobilepricestreaming.py`**: 
+  - Sends data from a CSV file to Kafka for streaming.
+
+## Getting Started
+
+1. **Set Up Environment**: 
+   - Ensure Redis, Hadoop, Spark, Kafka, and Delta Lake are properly installed and configured.
+
+2. **Kafka Producer**: 
+   - Run the Kafka Producer Script to ingest data from CSV files into Kafka topics.
+
+3. **Model Training**: 
+   - Execute the Model Training Script to train the Logistic Regression model and save it to HDFS.
+
+4. **Real-Time Processing**: 
+   - Start the Spark Streaming Script to process incoming data in real-time and write predictions to the Delta table.
+
+5. **Analyze Data**: 
+   - Use the Delta Table Reading Script to read and analyze data from the Delta table.
+
+6. **Orchestration**: 
+   - Use the Airflow DAG Script to manage the overall workflow and automate the execution of the above steps.
+
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 ### Built With
 
