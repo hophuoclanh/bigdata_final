@@ -212,6 +212,7 @@ Ensure you have the following software installed on your machine:
 3. Start the services:
    Note: Services are managed directly by the Airflow orchestration.
 
+<!-- Usage -->
 
 ### Usage
 # Start Airflow in Standalone Mode
@@ -249,6 +250,7 @@ On each computer that will act as a Redis worker, ensure that the following file
 
 
 
+<!-- Contributing -->
 
 ### Contributing
 
